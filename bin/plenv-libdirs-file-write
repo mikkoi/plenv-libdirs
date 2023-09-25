@@ -2,8 +2,7 @@
 # Usage: plenv libdirs-file-write <file> <libdirs>
 
 set -o errexit -o nounset -o pipefail
-d="${PLENV_DEBUG-}" && [ "${#d}" -gt 0 ] && set -o xtrace
-unset d
+[ -n "${PLENV_DEBUG-}" ] && set -o xtrace
 
 PLENV_LIBDIRS_FILE="$1"
 PLENV_LIBDIRS="$2"

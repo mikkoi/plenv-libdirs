@@ -31,11 +31,10 @@
 # be detected and added to the path.
 
 set -o errexit -o nounset -o pipefail
-d="${PLENV_DEBUG-}" && [ "${#d}" -gt 0 ] && set -o xtrace
-unset d
+[ -n "${PLENV_DEBUG-}" ] && set -o xtrace
 
 # Provide plenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1-}" = "--complete" ]; then
   echo --unset
   echo --prepend
   echo --append
@@ -46,7 +45,7 @@ if [ "$1" = "--complete" ]; then
   exit
 fi
 
-PLENV_LIBDIRS="$1"
+PLENV_LIBDIRS="${1-}"
 function chop_trailing_slash { echo "${1%\/}"; }
 function append_lib_dir {
   if [ -d "${1}/lib" ]; then echo "${1}/lib"; else echo "$1"; fi

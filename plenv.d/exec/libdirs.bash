@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -o errexit -o nounset -o pipefail
-d="${PLENV_DEBUG-}" && [ "${#d}" -gt 0 ] && set -o xtrace
-unset d
+[ -n "${PLENV_DEBUG-}" ] && set -o xtrace
 
 PLENV_LIBDIRS="$(plenv-libdirs)"
 PLENV_PERL5LIB="${PERL5LIB-NOT_SET}"
