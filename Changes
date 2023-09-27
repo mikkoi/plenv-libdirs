@@ -2,6 +2,8 @@
 
     - Add version info
     - Search and combine `.perl-libdirs` files in current and parent directories.
+    - Fix `plenv libdirs --remove` when there is only one entry.
+    - Fix `plenv libdirs --remove <dir>` when entry contains `/lib` and <dir> does not.
 
 0.001 2022-10-13
 

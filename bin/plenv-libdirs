@@ -84,11 +84,16 @@ elif [ "$PLENV_LIBDIRS" = "--add" ] || [ "$PLENV_LIBDIRS" = "--append" ]; then
   PLENV_NEW_DIR="$(append_lib_subdir "$(chop_trailing_slash "$2")")"
   plenv-libdirs-file-write .perl-libdirs "$PLENV_LIBDIRS${PLENV_LIBDIRS:+":"}$PLENV_NEW_DIR"
 elif [ "$PLENV_LIBDIRS" = "--remove" ] || [ "$PLENV_LIBDIRS" = "--rm" ]; then
-  PLENV_LIBDIRS="$(plenv-libdirs)"
-  PLENV_LIBDIRS=${PLENV_LIBDIRS//":$2:"/":"}
-  PLENV_LIBDIRS=${PLENV_LIBDIRS/#"$2:"/}
-  PLENV_LIBDIRS=${PLENV_LIBDIRS/%":$2"/}
-  plenv-libdirs-file-write .perl-libdirs "$PLENV_LIBDIRS"
+  PLENV_OLD_DIR="$(append_lib_subdir "$(chop_trailing_slash "$2")")"
+  PLENV_LIBDIRS="$(plenv-libdirs-file-read .perl-libdirs)"
+  if [ "${PLENV_LIBDIRS}" = "${PLENV_OLD_DIR}" ]; then
+    command -p rm -f .perl-libdirs
+  else
+    PLENV_LIBDIRS=${PLENV_LIBDIRS//":$PLENV_OLD_DIR:"/":"}  # middle
+    PLENV_LIBDIRS=${PLENV_LIBDIRS/#"$PLENV_OLD_DIR:"/}      # first from left
+    PLENV_LIBDIRS=${PLENV_LIBDIRS/%":$PLENV_OLD_DIR"/}      # first from right
+    plenv-libdirs-file-write .perl-libdirs "${PLENV_LIBDIRS}"
+  fi
 elif [[ $PLENV_LIBDIRS =~ ^-- ]]; then
   { echo "plenv: Unknown argument $PLENV_LIBDIRS"
     exit 1
