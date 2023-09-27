@@ -25,6 +25,7 @@ on *utils* and its test files have a dependency on *testing-utils*.
 Together, when working directory in `/root/project-a`,
 these would result in: `PERL5LIB=/root/testing-utils/lib:/root/utils/lib`
 
+```
 root: projects
 |- .perl-libdirs: **/root/utils/lib**
 |- project-a
@@ -37,6 +38,7 @@ root: projects
 |
 |- testing-utils
    |- lib
+```
 
 ## Installation
 
