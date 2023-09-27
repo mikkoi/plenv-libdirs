@@ -10,7 +10,6 @@
 #
 # Sets the local application-specific Perl libdirs by writing the
 # lib directories to a file named `.perl-libdirs'.
-# TODO Rest of docs
 #
 # When you run a Perl command, plenv will look for a `.perl-libdirs'
 # file in the current directory and each parent directory. If such
