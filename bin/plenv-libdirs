@@ -90,8 +90,13 @@ elif [[ $PLENV_LIBDIRS =~ ^-- ]]; then
 elif [ -n "$PLENV_LIBDIRS" ]; then
   plenv-libdirs-file-write .perl-libdirs "$PLENV_LIBDIRS"
 else
-  plenv-libdirs-file-read .perl-libdirs ||
-  { echo "plenv: no local libdirs configured for this directory"
-    exit 1
-  } >&2
+  declare -a plenv_libdirs_filepaths  # var from plenv-libdirs-files
+  eval "$(plenv-libdirs-files)"
+  PLENV_LIBDIRS=""
+  for fp in "${plenv_libdirs_filepaths[@]}"; do
+      PLENV_LIBDIRS="${PLENV_LIBDIRS:+$PLENV_LIBDIRS:}$(plenv-libdirs-file-read "${fp}")"
+  done
+  if [ -n "${PLENV_LIBDIRS}" ]; then
+    echo "${PLENV_LIBDIRS}"
+  fi
 fi
