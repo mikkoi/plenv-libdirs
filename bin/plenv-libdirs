@@ -26,13 +26,17 @@
 # being given by the command `perl -V:path_sep`).
 # The second line, if used, has settings.
 #
+# Parameter `--set` sets the contents of the working directory
+# `.perl-libdirs` file. It does not check the contents in any way.
+# This is same as command `plenv libdirs <path>`.
+#
 # Parameters `--prepend` and `--append` (alias `--add`)
 # add a path either as the first
 # path to search (beginning of list) or as the last (end of list).
 # If you add a path which itself has a sub dir `lib`, this will
 # be detected and added to the path.
 # N.B. This only works when using parameters `--prepend` and `--append,
-# not when doing `plenv libdirs <path>`.
+# not when doing `plenv libdirs <path>` or `plenv libdirs --set <path>`.
 #
 # Parameter `--remove` (alias `--rm`) deletes a path from the list.
 #
@@ -61,7 +65,9 @@ function append_lib_subdir {
   return 0
 }
 
-if [ "$PLENV_LIBDIRS" = "--unset" ]; then
+if [ "$PLENV_LIBDIRS" = "--set" ]; then
+  plenv-libdirs-file-write .perl-libdirs "${2}"
+elif [ "$PLENV_LIBDIRS" = "--unset" ]; then
   command -p rm -f .perl-libdirs
 elif [ "$PLENV_LIBDIRS" = "--prepend" ]; then
   PLENV_LIBDIRS="$(plenv-libdirs)"
