@@ -1,0 +1,8 @@
+0.002 2023-09-27
+
+    - Add version info
+    - Search and combine `.perl-libdirs` files in current and parent directories.
+
+0.001 2022-10-13
+
+    - Initial release
