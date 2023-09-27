@@ -21,20 +21,33 @@
 # plenv will do nothing.
 #
 # File `.perl-libdirs` first line follows the syntax of PERL5LIB
-# variable: paths are separated with `:` character. The second line,
-# if used, has settings.
+# variable: paths are separated with colon (`:` character) or
+# semicolon (`;`) on Windows (the proper path separator
+# being given by the command `perl -V:path_sep`).
+# The second line, if used, has settings.
 #
-# Parameters `--prepend` and `--append` add a path. Parameter
-# `--remove` deletes a path.
+# Parameter `--set` sets the contents of the working directory
+# `.perl-libdirs` file. It does not check the contents in any way.
+# This is same as command `plenv libdirs <path>`.
 #
-# N.B. If you add a path which itself has a sub dir "lib", this will
+# Parameters `--prepend` and `--append` (alias `--add`)
+# add a path either as the first
+# path to search (beginning of list) or as the last (end of list).
+# If you add a path which itself has a sub dir `lib`, this will
 # be detected and added to the path.
+# N.B. This only works when using parameters `--prepend` and `--append,
+# not when doing `plenv libdirs <path>` or `plenv libdirs --set <path>`.
+#
+# Parameter `--remove` (alias `--rm`) deletes a path from the list.
+#
+# Parameter --unset deletes the file `.perl-libdirs`.
+#
 
-set -e
-[ -n "$PLENV_DEBUG" ] && set -x
+set -o errexit -o nounset -o pipefail
+[ -n "${PLENV_DEBUG-}" ] && set -o xtrace
 
 # Provide plenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1-}" = "--complete" ]; then
   echo --unset
   echo --prepend
   echo --append
@@ -45,22 +58,24 @@ if [ "$1" = "--complete" ]; then
   exit
 fi
 
-PLENV_LIBDIRS="$1"
+PLENV_LIBDIRS="${1-}"
 function chop_trailing_slash { echo "${1%\/}"; }
-function append_lib_dir {
+function append_lib_subdir {
   if [ -d "${1}/lib" ]; then echo "${1}/lib"; else echo "$1"; fi
   return 0
 }
 
-if [ "$PLENV_LIBDIRS" = "--unset" ]; then
+if [ "$PLENV_LIBDIRS" = "--set" ]; then
+  plenv-libdirs-file-write .perl-libdirs "${2}"
+elif [ "$PLENV_LIBDIRS" = "--unset" ]; then
   command -p rm -f .perl-libdirs
 elif [ "$PLENV_LIBDIRS" = "--prepend" ]; then
   PLENV_LIBDIRS="$(plenv-libdirs)"
-  PLENV_NEW_DIR="$(append_lib_dir "$(chop_trailing_slash "$2")")"
+  PLENV_NEW_DIR="$(append_lib_subdir "$(chop_trailing_slash "$2")")"
   plenv-libdirs-file-write .perl-libdirs "$PLENV_NEW_DIR${PLENV_LIBDIRS:+":"}$PLENV_LIBDIRS"
 elif [ "$PLENV_LIBDIRS" = "--add" ] || [ "$PLENV_LIBDIRS" = "--append" ]; then
   PLENV_LIBDIRS="$(plenv-libdirs)"
-  PLENV_NEW_DIR="$(append_lib_dir "$(chop_trailing_slash "$2")")"
+  PLENV_NEW_DIR="$(append_lib_subdir "$(chop_trailing_slash "$2")")"
   plenv-libdirs-file-write .perl-libdirs "$PLENV_LIBDIRS${PLENV_LIBDIRS:+":"}$PLENV_NEW_DIR"
 elif [ "$PLENV_LIBDIRS" = "--remove" ] || [ "$PLENV_LIBDIRS" = "--rm" ]; then
   PLENV_LIBDIRS="$(plenv-libdirs)"
@@ -75,8 +90,13 @@ elif [[ $PLENV_LIBDIRS =~ ^-- ]]; then
 elif [ -n "$PLENV_LIBDIRS" ]; then
   plenv-libdirs-file-write .perl-libdirs "$PLENV_LIBDIRS"
 else
-  plenv-libdirs-file-read .perl-libdirs ||
-  { echo "plenv: no local libdirs configured for this directory"
-    exit 1
-  } >&2
+  declare -a plenv_libdirs_filepaths  # var from plenv-libdirs-files
+  eval "$(plenv-libdirs-files)"
+  PLENV_LIBDIRS=""
+  for fp in "${plenv_libdirs_filepaths[@]}"; do
+      PLENV_LIBDIRS="${PLENV_LIBDIRS:+$PLENV_LIBDIRS:}$(plenv-libdirs-file-read "${fp}")"
+  done
+  if [ -n "${PLENV_LIBDIRS}" ]; then
+    echo "${PLENV_LIBDIRS}"
+  fi
 fi

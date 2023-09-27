@@ -8,7 +8,7 @@ A [plenv](https://github.com/tokuhirom/plenv) plugin to add additional include d
 mkdir -p ${PLENV_ROOT}/plugins
 git clone https://github.com/mikkoi/plenv-libdirs.git ${PLENV_ROOT}/plugins/plenv-libdirs
 mkdir -p ${PLENV_ROOT}/plenv.d/exec
-cp ${PLENV_ROOT}/plugins/plenv-libdirs/plenv.d/exec/libdirs.bash ${PLENV_ROOT}/plenv.d/exec/
+ln -s ${PLENV_ROOT}/plugins/plenv-libdirs/plenv.d/exec/libdirs.bash ${PLENV_ROOT}/plenv.d/exec/libdirs.bash
 ```
 
 ## Usage
