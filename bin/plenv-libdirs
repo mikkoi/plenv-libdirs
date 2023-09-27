@@ -46,8 +46,10 @@
 set -o errexit -o nounset -o pipefail
 [ -n "${PLENV_DEBUG-}" ] && set -o xtrace
 
+VERSION='0.002'
 # Provide plenv completions
 if [ "${1-}" = "--complete" ]; then
+  echo --version
   echo --unset
   echo --prepend
   echo --append
@@ -64,8 +66,13 @@ function append_lib_subdir {
   if [ -d "${1}/lib" ]; then echo "${1}/lib"; else echo "$1"; fi
   return 0
 }
+function version_info {
+  echo "plenv-libdirs ${VERSION}"
+}
 
-if [ "$PLENV_LIBDIRS" = "--set" ]; then
+if [ "$PLENV_LIBDIRS" = "--version" ]; then
+  version_info
+elif [ "$PLENV_LIBDIRS" = "--set" ]; then
   plenv-libdirs-file-write .perl-libdirs "${2}"
 elif [ "$PLENV_LIBDIRS" = "--unset" ]; then
   command -p rm -f .perl-libdirs
