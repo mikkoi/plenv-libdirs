@@ -45,7 +45,7 @@
 set -o errexit -o nounset -o pipefail
 [ -n "${PLENV_DEBUG-}" ] && set -o xtrace
 
-VERSION='0.002'
+VERSION='0.003'
 # Provide plenv completions
 if [ "${1-}" = "--complete" ]; then
   echo --version
