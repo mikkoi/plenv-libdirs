@@ -76,22 +76,25 @@ elif [ "$PLENV_LIBDIRS" = "--set" ]; then
 elif [ "$PLENV_LIBDIRS" = "--unset" ]; then
   command -p rm -f .perl-libdirs
 elif [ "$PLENV_LIBDIRS" = "--prepend" ]; then
-  PLENV_LIBDIRS="$(plenv-libdirs)"
+  PLENV_LIBDIRS="$(plenv-libdirs-file-read .perl-libdirs)"
   PLENV_NEW_DIR="$(append_lib_subdir "$(chop_trailing_slash "$2")")"
   plenv-libdirs-file-write .perl-libdirs "$PLENV_NEW_DIR${PLENV_LIBDIRS:+":"}$PLENV_LIBDIRS"
 elif [ "$PLENV_LIBDIRS" = "--add" ] || [ "$PLENV_LIBDIRS" = "--append" ]; then
-  PLENV_LIBDIRS="$(plenv-libdirs)"
+  PLENV_LIBDIRS="$(plenv-libdirs-file-read .perl-libdirs)"
   PLENV_NEW_DIR="$(append_lib_subdir "$(chop_trailing_slash "$2")")"
   plenv-libdirs-file-write .perl-libdirs "$PLENV_LIBDIRS${PLENV_LIBDIRS:+":"}$PLENV_NEW_DIR"
 elif [ "$PLENV_LIBDIRS" = "--remove" ] || [ "$PLENV_LIBDIRS" = "--rm" ]; then
   PLENV_OLD_DIR="$(append_lib_subdir "$(chop_trailing_slash "$2")")"
   PLENV_LIBDIRS="$(plenv-libdirs-file-read .perl-libdirs)"
-  if [ "${PLENV_LIBDIRS}" = "${PLENV_OLD_DIR}" ]; then
+  if [ "${PLENV_LIBDIRS}" = "${PLENV_OLD_DIR}" ] || [ "${PLENV_LIBDIRS}" = "$2" ]; then
     command -p rm -f .perl-libdirs
   else
     PLENV_LIBDIRS=${PLENV_LIBDIRS//":$PLENV_OLD_DIR:"/":"}  # middle
     PLENV_LIBDIRS=${PLENV_LIBDIRS/#"$PLENV_OLD_DIR:"/}      # first from left
     PLENV_LIBDIRS=${PLENV_LIBDIRS/%":$PLENV_OLD_DIR"/}      # first from right
+    PLENV_LIBDIRS=${PLENV_LIBDIRS//":$2:"/":"}  # middle
+    PLENV_LIBDIRS=${PLENV_LIBDIRS/#"$2:"/}      # first from left
+    PLENV_LIBDIRS=${PLENV_LIBDIRS/%":$2"/}      # first from right
     plenv-libdirs-file-write .perl-libdirs "${PLENV_LIBDIRS}"
   fi
 elif [[ $PLENV_LIBDIRS =~ ^-- ]]; then
