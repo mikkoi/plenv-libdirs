@@ -1,3 +1,7 @@
+0.004
+
+    - Create completion for --rm and --remove parameters.
+
 0.003 2023-10-29
 
     - Fix adding and removing

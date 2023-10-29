@@ -48,14 +48,19 @@ set -o errexit -o nounset -o pipefail
 VERSION='0.003'
 # Provide plenv completions
 if [ "${1-}" = "--complete" ]; then
-  echo --version
-  echo --unset
-  echo --prepend
-  echo --append
-  echo --add
-  echo --remove
-  echo --rm
-  # TODO Add file/path completion
+  if [ "${2-}" == '--remove' ] || [ "${2-}" == '--rm' ]; then
+    plenv-libdirs-file-read .perl-libdirs | tr ':' "\n"
+  else
+    echo --version
+    echo --unset
+    echo --prepend
+    echo --append
+    echo --add
+    echo --remove
+    echo --rm
+    # TODO Add file/path completion
+    \ls -1
+  fi
   exit
 fi
 
